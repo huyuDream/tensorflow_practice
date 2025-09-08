@@ -41,7 +41,7 @@ rm -rf ~/.cache
 # 编译二进制产出路径
 bazel-bin/tensorflow_serving/model_servers/tensorflow_model_server
 
-
+# 模型启动命令
 /data/code/bin/tensorflow_model_server --model_config_file=/data/code/models/deep_models.config \
                                        --model_config_file_poll_wait_seconds=60 \
                                        --monitoring_config_file=/data/code/config/prometheus_config.json \
