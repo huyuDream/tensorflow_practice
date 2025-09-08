@@ -9,7 +9,14 @@ https://github.com/tensorflow/serving/blob/2.19.0/tensorflow_serving/tools/docke
 
 linux为例,构建编译镜像
 # 构建tf基础编译镜像2.19
-docker build -f ./Dockerfile.devel.2.19  -t tf_base_2_19 .
+docker build -f ./Dockerfile.devel.2.19  -t tf_base_2_19_devel .
+
+
+
+
+
+
+
 # 生成容器, 二选一(第一条命令映射了目录)
 docker run -it -v /root/william/:/home/src/ --name tf_compile imageid /bin/bash
 docker run -it --name tf_base_2_19 imageid /bin/bash
