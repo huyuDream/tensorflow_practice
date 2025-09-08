@@ -1,3 +1,5 @@
+介绍tf serving的docker编译流程
+
 #官方docker文件地址
 https://github.com/tensorflow/serving/tree/2.19.0/tensorflow_serving/tools/docker
 https://github.com/tensorflow/serving/blob/2.19.0/tensorflow_serving/tools/docker/Dockerfile.devel
@@ -6,7 +8,7 @@ https://github.com/tensorflow/serving/blob/2.19.0/tensorflow_serving/tools/docke
 搭建编译环境, 稍微改写了Dockerfile.devel, 见目录下Dockerfile.devel.2.19
 
 linux为例,构建编译镜像
-# 制作tf基础编译镜像2.19
+# 构建tf基础编译镜像2.19
 docker build -f ./Dockerfile.devel.2.19  -t tf_base_2_19 .
 # 生成容器, 二选一(第一条命令映射了目录)
 docker run -it -v /root/william/:/home/src/ --name tf_compile imageid /bin/bash
