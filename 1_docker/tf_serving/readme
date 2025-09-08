@@ -10,59 +10,30 @@ https://github.com/tensorflow/serving/blob/2.19.0/tensorflow_serving/tools/docke
 linux为例,构建编译镜像
 # 构建tf基础编译镜像2.19
 docker build -f ./Dockerfile.devel.2.19  -t tf_base_2_19_devel .
-
-
-
-
-
-
-
-# 生成容器, 二选一(第一条命令映射了目录)
-docker run -it -v /root/william/:/home/src/ --name tf_compile imageid /bin/bash
-docker run -it --name tf_base_2_19 imageid /bin/bash
-
-
-
-
-
-
-
-
+# 生成容器, 二选一(第一条命令映射了容器和linnux目录)
+docker run -it -v {linux_path}:{docker_path} --name {container_name} {imageid} /bin/bash
+例: docker run -it -v /root/william/:/home/src --name tf_serving_dev 9dd198625184 /bin/bash
+docker run -it --name {container_name} {imageid} /bin/bash
 
 # 进入容器
-docker exec -it tf_base_2_19 /bin/bash
-# 设置公钥 -- 同步至git仓库  -- 完成可跳过
-ssh-keygen
+docker exec -it {container_name} /bin/bash
+例: docker exec -it tf_serving_dev /bin/bash
 
-# 编译mg-model_version  -- 完成可跳过
-cd /home/src/
-git clone git@git.7k7k.com:algorithm-engineering/hella_tf/hella-mg-model_version.git
-cd hella-mg-model_version
-bash shell/build.sh
+# 下载编译tf_serving源码
+wget https://github.com/tensorflow/serving/archive/refs/tags/2.19.0.zip
+# 解压缩
+unzip 2.19.0.zip
+cd serving-2.19.0/
 
-# 编译tf
-cd /home/src/
-git clone git@git.7k7k.com:algorithm-engineering/hella_tf/hella-tf_serving2.19.0.git
-cd hella-tf_serving2.19.0/
-# 如需切换分支
-#git checkout -b dev_william origin/dev_william
-#git pull 
-# 清除缓存
-bash hella_shell/clean.sh
-# 编译代码
-bash hella_shell/build.sh
-# 运行
-# sh hella_shell/start.sh
+# 编译命令
+bazel build --color=yes --curses=yes \
+            --verbose_failures \
+            --output_filter=DONT_MATCH_ANYTHING \
+            --config=release \
+            --config=kokoro \
+            tensorflow_serving/model_servers:tensorflow_model_server
 
-# 编译完成退出容器, 推送新镜像
-# 获取令牌
-aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 459528473147.dkr.ecr.us-west-2.amazonaws.com
-# 根据容器生成新images  
-# 例: docker commit tf_base_2_19 tf_base_2_19_20250514:tf_base_2_19_20250514
-docker commit {cantainer_name} tf_base_2_19_{version}:tf_base_2_19_{version}
-# 标记镜像
-# 例: docker tag tf_base_2_19_20250514:tf_base_2_19_20250514 459528473147.dkr.ecr.us-west-2.amazonaws.com/shangyehua/hella-docker:tf_base_2_19_20250514
-docker tag tf_base_2_19_{version}:tf_base_2_19_{version} 459528473147.dkr.ecr.us-west-2.amazonaws.com/shangyehua/hella-docker:tf_base_2_19_{version}
-# 推送镜像
-# 例: docker push 459528473147.dkr.ecr.us-west-2.amazonaws.com/shangyehua/hella-docker:tf_base_2_19_20250514
-docker push 459528473147.dkr.ecr.us-west-2.amazonaws.com/shangyehua/hella-docker:tf_base_2_19_{version}
+# 清楚编译
+bazel clean --expunge --color=yes;
+rm -rf ~/.cache
+
