@@ -48,9 +48,22 @@ bazel-bin/tensorflow_serving/model_servers/tensorflow_model_server
                                        --monitoring_config_file=/data/code/config/prometheus_config.json \
                                        --rest_api_port=8502
 
+注意: 可能因缺少deep_models.config、 prometheus_config.json启动失败
+
 说明:
-model_config_file: 加载模型配置文件
-model_config_file_poll_wait_seconds: 模型配置监听时间
-monitoring_config_file: 监控配置
-rest_api_port: http端口
+model_config_file: 
+    模型配置文件
+    pb格式地址:
+    https://github.com/tensorflow/serving/blob/2.19.0/tensorflow_serving/config/model_server_config.proto
+
+model_config_file_poll_wait_seconds: 
+    模型配置监听时间
+
+monitoring_config_file: 
+    监控配置
+    pb格式地址
+    https://github.com/tensorflow/serving/blob/2.19.0/tensorflow_serving/config/monitoring_config.proto
+
+rest_api_port: 
+    http端口
 
