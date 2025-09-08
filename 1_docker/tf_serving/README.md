@@ -1,6 +1,7 @@
-介绍tf serving的docker编译流程
+# 介绍tf serving的docker编译流程
+简单介绍下tf serving: 提供模型在线预估服务
 
-#官方docker文件地址
+# 官方docker文件地址
 https://github.com/tensorflow/serving/tree/2.19.0/tensorflow_serving/tools/docker
 https://github.com/tensorflow/serving/blob/2.19.0/tensorflow_serving/tools/docker/Dockerfile.devel
 
