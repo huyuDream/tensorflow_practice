@@ -1,0 +1,150 @@
+# 原文件
+# https://github.com/tensorflow/serving/blob/2.19.0/tensorflow_serving/tools/docker/Dockerfile.devel
+
+#构建镜像
+# docker build -f ./Dockerfile.devel.2.19  -t tf_base_219 .
+# 生成容器
+# docker run -it --name tf_base_219 imageid /bin/bash
+
+FROM ubuntu:20.04
+
+# ARG TF_SERVING_VERSION_GIT_BRANCH=master
+# ARG TF_SERVING_VERSION_GIT_COMMIT=HEAD
+# 避免openjdk-8-jdk交互阻塞
+ARG DEBIAN_FRONTEND=noninteractive
+
+# LABEL maintainer=gvasudevan@google.com
+# LABEL tensorflow_serving_github_branchtag=${TF_SERVING_VERSION_GIT_BRANCH}
+# LABEL tensorflow_serving_github_commit=${TF_SERVING_VERSION_GIT_COMMIT}
+
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends automake
+RUN apt-get install -y --no-install-recommends build-essential
+RUN apt-get install -y --no-install-recommends ca-certificates
+RUN apt-get install -y --no-install-recommends curl
+RUN apt-get install -y --no-install-recommends git
+RUN apt-get install -y --no-install-recommends gcc-10
+RUN apt-get install -y --no-install-recommends g++-10
+RUN apt-get install -y --no-install-recommends libcurl3-dev
+RUN apt-get install -y --no-install-recommends libfreetype6-dev
+RUN apt-get install -y --no-install-recommends libpng-dev
+RUN apt-get install -y --no-install-recommends libtool
+RUN apt-get install -y --no-install-recommends libzmq3-dev
+RUN apt-get install -y --no-install-recommends mlocate
+RUN apt-get install -y --no-install-recommends openjdk-8-jdk
+RUN apt-get install -y --no-install-recommends openjdk-8-jre-headless
+RUN apt-get install -y --no-install-recommends pkg-config
+RUN apt-get install -y --no-install-recommends python-dev
+RUN apt-get install -y --no-install-recommends software-properties-common
+RUN apt-get install -y --no-install-recommends swig
+RUN apt-get install -y --no-install-recommends unzip
+RUN apt-get install -y --no-install-recommends wget
+RUN apt-get install -y --no-install-recommends zip
+RUN apt-get install -y --no-install-recommends zlib1g-dev
+RUN apt-get install -y --no-install-recommends python3-distutils
+RUN apt-get install -y --no-install-recommends openssh-server
+RUN apt-get install -y --no-install-recommends ssh
+RUN apt-get install -y --no-install-recommends net-tools
+RUN apt-get install -y --no-install-recommends cmake
+RUN apt-get install -y --no-install-recommends libssl-dev
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+
+
+
+# Install python 3.9.
+RUN add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && apt-get install -y \
+    python3.9 python3.9-dev python3-pip python3.9-venv && \
+    rm -rf /var/lib/apt/lists/* && \
+    python3.9 -m pip install pip --upgrade && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 0
+
+# Make python3.9 the default python version
+# If updating default python version, also update version in the WORKSPACE file.
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.9 0
+
+RUN curl -fSsL -O https://bootstrap.pypa.io/get-pip.py && \
+    python3 get-pip.py && \
+    rm get-pip.py
+
+RUN pip3 --no-cache-dir install \
+    future>=0.17.1 \
+    grpcio \
+    h5py \
+    keras_applications>=1.0.8 \
+    keras_preprocessing>=1.1.0 \
+    mock \
+    numpy \
+    portpicker \
+    requests \
+    --ignore-installed setuptools \
+    --ignore-installed six>=1.12.0
+
+# Set up Bazel
+ENV BAZEL_VERSION 6.5.0
+WORKDIR /
+RUN mkdir /bazel && \
+    cd /bazel && \
+    curl -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36" -fSsL -O https://github.com/bazelbuild/bazel/releases/download/$BAZEL_VERSION/bazel-$BAZEL_VERSION-installer-linux-x86_64.sh && \
+    curl -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36" -fSsL -o /bazel/LICENSE.txt https://raw.githubusercontent.com/bazelbuild/bazel/master/LICENSE && \
+    chmod +x bazel-*.sh && \
+    ./bazel-$BAZEL_VERSION-installer-linux-x86_64.sh && \
+    cd / && \
+    rm -f /bazel/bazel-$BAZEL_VERSION-installer-linux-x86_64.sh
+
+# 安装aws sdk
+WORKDIR /home/src/
+RUN git clone https://github.com/aws/aws-sdk-cpp.git
+RUN cd aws-sdk-cpp && \
+    git checkout tags/1.11.546  -b 1.11.546 && \
+    git submodule update --init --recursive && \
+    mkdir build && \
+    cd build  && \
+    cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr/local/include/aws/ -DBUILD_ONLY="s3" && \
+    cmake --build . && \
+    cmake --install .  && \
+    rm -fr /home/src/aws-sdk-cpp/
+
+# # Download TF Serving sources (optionally at specific commit).
+# WORKDIR /tensorflow-serving
+# RUN curl -sSL --retry 5 https://github.com/tensorflow/serving/tarball/${TF_SERVING_VERSION_GIT_COMMIT} | tar --strip-components=1 -xzf -
+
+# FROM base_build as binary_build
+# # Build, and install TensorFlow Serving
+# ARG TF_SERVING_BUILD_OPTIONS="--config=release"
+# RUN echo "Building with build options: ${TF_SERVING_BUILD_OPTIONS}"
+# ARG TF_SERVING_BAZEL_OPTIONS=""
+# RUN echo "Building with Bazel options: ${TF_SERVING_BAZEL_OPTIONS}"
+
+# RUN bazel build --color=yes --curses=yes \
+#     ${TF_SERVING_BAZEL_OPTIONS} \
+#     --verbose_failures \
+#     --output_filter=DONT_MATCH_ANYTHING \
+#     ${TF_SERVING_BUILD_OPTIONS} \
+#     --config=kokoro \
+#     tensorflow_serving/model_servers:tensorflow_model_server && \
+#     cp bazel-bin/tensorflow_serving/model_servers/tensorflow_model_server \
+#     /usr/local/bin/
+
+#bazel build --color=yes --curses=yes --verbose_failures --output_filter=DONT_MATCH_ANYTHING --config=release --config=kokoro tensorflow_serving/model_servers:tensorflow_model_server
+
+# # Build and install TensorFlow Serving API
+# RUN bazel build --color=yes --curses=yes \
+#     ${TF_SERVING_BAZEL_OPTIONS} \
+#     --verbose_failures \
+#     --output_filter=DONT_MATCH_ANYTHING \
+#     ${TF_SERVING_BUILD_OPTIONS} \
+#     --config=kokoro \
+#     tensorflow_serving/tools/pip_package:build_pip_package && \
+#     bazel-bin/tensorflow_serving/tools/pip_package/build_pip_package \
+#     /tmp/pip && \
+#     pip --no-cache-dir install --upgrade \
+#     /tmp/pip/tensorflow_serving_api-*.whl && \
+#     rm -rf /tmp/pip
+
+# FROM binary_build as clean_build
+# # Clean up Bazel cache when done.
+# RUN bazel clean --expunge --color=yes && \
+#     rm -rf /root/.cache
+# CMD ["/bin/bash"]
