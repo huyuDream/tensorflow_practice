@@ -2,48 +2,41 @@
 1. 下载官方镜像 -- 2.19.0
     docker pull tensorflow/tensorflow:2.19.0
 
-2 生成容器, 二选一(第一条命令映射了容器和linux目录)
-docker run -it -v {linux_path}:{docker_path} --name {container_name} {imageid} /bin/bash
-例: docker run -it -v /root/william/:/home/src --name tensorflow_219 c2a7ea358d85 /bin/bash
-docker run -it --name {container_name} {imageid} /bin/bash
-
-
-
-
-
-
-
-
-
-
-2. 生成dokcer
-    # 有目录映射
-    docker run -it -v /root/william/:/home/src/ --name tensorflow_219 imageid /bin/bash
-    # 无目录映射
-    docker run -it --name tensorflow_219 imageid /bin/bash
-    # 进入容器
+2. 生成容器, 二选一(第一条命令映射了容器和linux目录)
+    docker run -it -v {linux_path}:{docker_path} --name {container_name} {imageid} /bin/bash
+    例: docker run -it -v /root/william/:/home/src --name tensorflow_219 c2a7ea358d85 /bin/bash
+    docker run -it --name {container_name} {imageid} /bin/bash
+3. 进入容器
     docker exec -it tensorflow_219 /bin/bash
-3. 下载tensorflow版本
-    2.19
-        https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.19.0.zip
-        2.19编译不通过  -- 编译器版本 不支持 mavxvnniint8指令
-    2.15.1
-        https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.15.1.zip
-        2.15.1编译通过
 4. 安装bazel
     使用bazelisk
-        https://github.com/bazelbuild/bazelisk/releases/download/v1.27.0/bazelisk-linux-amd64
-5. 编译saved_model_cli 、 build_pip_package
-    编译saved_model_cli
-        bazel build //tensorflow/python/tools:saved_model_cli
-        bazelisk build //tensorflow/python/tools:saved_model_cli
-    编译build_pip_package
-        bazel build //tensorflow/tools/pip_package:build_pip_package
-        bazelisk build //tensorflow/tools/pip_package:build_pip_package
-
-    tensorflow版本
-        2.19编译不通过  -- 编译器版本 不支持 mavxvnniint8指令
+       wget https://github.com/bazelbuild/bazelisk/releases/download/v1.27.0/bazelisk-linux-amd64
+       chmod +x bazelisk-linux-amd64
+       cp  bazelisk-linux-amd64 /usr/bin/bazelisk
+5. 下载tensorflow版本
+    2.19
+        weget https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.19.0.zip
+        版本编译不通过, 镜像自带gcc版本:11.4.0。 不支持编译mavxvnniint8指令, 可以尝试升级gcc编译器
+    2.15.1
+        wget https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.15.1.zip
+        unzip v2.15.1.zip
         2.15.1编译通过
+5. 编译saved_model_cli 、 build_pip_package
+    cd tensorflow-2.15.1
+    先执行 /configure
+        注意: Do you want to use Clang to build TensorFlow
+            选择n, 将会使用gcc进行编译
+        其他均为默认
+
+    编译命令
+    编译saved_model_cli
+        bazelisk build //tensorflow/python/tools:saved_model_cli
+        #bazel build //tensorflow/python/tools:saved_model_cli
+        
+    编译build_pip_package
+        bazelisk build //tensorflow/tools/pip_package:build_pip_package
+        #bazel build //tensorflow/tools/pip_package:build_pip_package
+
 
 6. 使用saved_model_cli
     显示所有内容（tags，signatures，inputs，outputs）
