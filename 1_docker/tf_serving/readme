@@ -11,7 +11,7 @@ https://github.com/tensorflow/serving/blob/2.19.0/tensorflow_serving/tools/docke
 linux为例,构建编译镜像
 # 构建tf基础编译镜像2.19
 docker build -f ./Dockerfile.devel.2.19  -t tf_base_2_19_devel .
-# 生成容器, 二选一(第一条命令映射了容器和linnux目录)
+# 生成容器, 二选一(第一条命令映射了容器和linux目录)
 docker run -it -v {linux_path}:{docker_path} --name {container_name} {imageid} /bin/bash
 例: docker run -it -v /root/william/:/home/src --name tf_serving_dev 9dd198625184 /bin/bash
 docker run -it --name {container_name} {imageid} /bin/bash
@@ -47,6 +47,9 @@ bazel-bin/tensorflow_serving/model_servers/tensorflow_model_server
                                        --model_config_file_poll_wait_seconds=60 \
                                        --monitoring_config_file=/data/code/config/prometheus_config.json \
                                        --rest_api_port=8502
+# 模型启动命令
+/data/code/bin/tensorflow_model_server --model_base_path={your_path} \
+                                       --model_name=test
 
 注意: 可能因缺少deep_models.config、 prometheus_config.json启动失败
 
