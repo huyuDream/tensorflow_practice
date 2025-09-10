@@ -37,3 +37,4 @@ probability_model = tf.keras.Sequential([
 
 probability_model(x_test[:5])
 
+model.save("./")
