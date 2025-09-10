@@ -14,5 +14,19 @@ model.export("./model_output/")
 执行成功后在./model_output/便可看到相应的模型
 
 
-# 加载模型
+# 启动命令
+{your_path}/tensorflow_model_server --model_base_path={your_path} \
+                                       --model_name={model_name} \
+                                       --rest_api_port=8502
+
+# 启动命令
+./bazel-bin/tensorflow_serving/model_servers/tensorflow_model_server \
+    --model_base_path=/home/src/tensorflow_practice/2_first_model/model_output/ \
+    --model_name=test \
+    --rest_api_port=8502
+
+
+# 查询模型接口
+# http://172.18.0.2:8502/v1/models/{{model_name}}/metadata
+curl http://172.18.0.2:8502/v1/models/test/metadata
 
