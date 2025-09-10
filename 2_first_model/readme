@@ -1,1 +1,8 @@
-第一个模型
+用生成第一个模型，并用tf_serving进行加载
+
+first_model.py 参照官方实例
+https://tensorflow.google.cn/tutorials/quickstart/beginner?hl=zh-cn
+
+在最后新增到导出模型
+model.export("./")
+
