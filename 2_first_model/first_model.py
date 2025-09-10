@@ -13,3 +13,8 @@ model = tf.keras.models.Sequential([
   tf.keras.layers.Dropout(0.2),
   tf.keras.layers.Dense(10)
 ])
+
+predictions = model(x_train[:1]).numpy()
+predictions
+
+tf.nn.softmax(predictions).numpy()
