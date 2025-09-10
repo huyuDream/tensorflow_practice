@@ -33,6 +33,10 @@ print(f"Mean Squared Error: {loss}")
 predictions = model.predict(x_data)
 print("Predictions:", predictions)
 
+# 保存模型
+#model.save("model.keras", save_format="tf") # keras 2.0
+model.export("./model_output/20250910/") # keras 3.0
+
 
 # plt.scatter(x_data, y_data, color='blue', label='Actual data')  # 绘制实际数据点
 # plt.plot(x_data, predictions, color='red', label='Fitted line')  # 绘制拟合线
