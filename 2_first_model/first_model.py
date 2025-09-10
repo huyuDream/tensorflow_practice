@@ -14,7 +14,9 @@ model = tf.keras.models.Sequential([
   tf.keras.layers.Dense(10)
 ])
 
+print("predictions")
 predictions = model(x_train[:1]).numpy()
 predictions
 
+print("softmax")
 tf.nn.softmax(predictions).numpy()
