@@ -4,7 +4,7 @@
 
 两容器目录共享，省去拷贝模型步骤。
 
-# 生成模型
+# 生成模型 -- 线性回归模型
 first_model.py 参照官方实例
 https://tensorflow.google.cn/tutorials/quickstart/beginner?hl=zh-cn
 
