@@ -38,6 +38,6 @@ probability_model = tf.keras.Sequential([
 probability_model(x_test[:5])
 
 # 保存模型
-model.save("model.keras", save_format="tf")
-#model.export("./model_output/")
+#model.save("model.keras", save_format="tf") # keras 2.0
+model.export("./model_output/20250910/") # keras 3.0
 
