@@ -1,5 +1,5 @@
 # 介绍tf serving的docker编译流程
-简单介绍下tf serving: 提供模型在线预估服务
+下tf serving: 提供模型在线预估服务
 
 # 官方docker文件地址
 https://github.com/tensorflow/serving/tree/2.19.0/tensorflow_serving/tools/docker
@@ -43,13 +43,14 @@ rm -rf ~/.cache
 bazel-bin/tensorflow_serving/model_servers/tensorflow_model_server
 
 # 模型启动命令
-/data/code/bin/tensorflow_model_server --model_config_file=/data/code/models/deep_models.config \
+{your_path}/tensorflow_model_server --model_config_file=/data/code/models/deep_models.config \
                                        --model_config_file_poll_wait_seconds=60 \
                                        --monitoring_config_file=/data/code/config/prometheus_config.json \
                                        --rest_api_port=8502
 # 模型启动命令
-/data/code/bin/tensorflow_model_server --model_base_path={your_path} \
-                                       --model_name=test
+{your_path}/tensorflow_model_server --model_base_path={your_path} \
+                                       --model_name=test \
+                                       --rest_api_port=8502
 
 注意: 可能因缺少deep_models.config、 prometheus_config.json启动失败
 
