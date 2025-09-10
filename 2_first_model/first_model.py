@@ -38,4 +38,5 @@ probability_model = tf.keras.Sequential([
 probability_model(x_test[:5])
 
 # 保存模型
-model.export("./model_output/")
+#model.export("./model_output/")
+model.save(filepath="./model_output/", save_format="tf")

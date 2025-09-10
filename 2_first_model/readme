@@ -1,8 +1,18 @@
-用生成第一个模型，并用tf_serving进行加载
+#生成第一个模型，并用tf_serving进行加载
+准备好两个容器,如1_docker
+    tensorflow_219
+    tf_serving_dev
+    两容器目录共享，剩去拷贝模型步骤。
 
+# 生成模型
 first_model.py 参照官方实例
 https://tensorflow.google.cn/tutorials/quickstart/beginner?hl=zh-cn
 
 在最后新增到导出模型
-model.export("./")
+model.export("./model_output/")
+
+执行成功后在./model_output/便可看到相应的模型
+
+
+# 加载模型
 
